@@ -10,7 +10,7 @@ Using the command prompt, navigate to where schema.sql is.
 
 Create an empty database with the command:
 
-    createdb ap_db
+    createdb -U postgres ap_db
 
 Next, use schema.sql to create the tables: 
 
