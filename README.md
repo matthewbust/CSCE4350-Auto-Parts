@@ -18,4 +18,4 @@ Next, use schema.sql to create the tables:
 
 To use the psql shell, you must enter the server, the database, the port, and your username and password. 
 
-The default values can be used by just pressing enter until the password comes up, postgres is the default username. Enter your password chosen on psql installation.
+The default values can be used by just pressing enter until the password comes up, postgres is the default username. Make sure database is set to the right database i.e. ap_db. Enter your password chosen on psql installation.
