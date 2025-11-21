@@ -13,6 +13,21 @@ function Cart({ user }) {
   useEffect(() => {
     if (user && user.customerId) {
       fetchCart();
+    } else {
+      // load local cart for anonymous users
+      const raw = localStorage.getItem('localCart');
+      if (raw) {
+        try {
+          const local = JSON.parse(raw);
+          setCartItems(local);
+        } catch (err) {
+          console.error('Failed to parse local cart', err);
+          setCartItems([]);
+        }
+      } else {
+        setCartItems([]);
+      }
+      setLoading(false);
     }
   }, [user]);
 
@@ -58,21 +73,31 @@ function Cart({ user }) {
       return;
     }
 
+    if (!user || !user.customerId) {
+      // anonymous users must login to checkout
+      setMessage('Please login or register to complete checkout');
+      setTimeout(() => setMessage(''), 2500);
+      navigate('/login');
+      return;
+    }
+
     setProcessing(true);
     try {
       const orderData = {
-        customerId: user.customerId,
+        customer_id: user.customerId,
         items: cartItems.map(item => ({
-          partId: item.part_id,
+          part_id: item.part_id,
           quantity: item.quantity,
-          unitPrice: parseFloat(item.price)
+          unit_price: parseFloat(item.price)
         })),
-        totalAmount: calculateTotal()
+        total_amount: calculateTotal()
       };
 
       await orderAPI.createOrder(orderData);
       await cartAPI.clearCart(user.customerId);
       setMessage('Order placed successfully!');
+      // clear local cart as well
+      localStorage.removeItem('localCart');
       setTimeout(() => {
         navigate('/orders');
       }, 2000);

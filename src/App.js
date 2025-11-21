@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
+import { cartAPI } from './services/api';
 
 // Components
 import Navbar from './components/Navbar';
@@ -15,9 +16,30 @@ import OrderHistory from './pages/OrderHistory';
 function App() {
   const [user, setUser] = useState(null);
 
-  const handleLogin = (userData) => {
+  const handleLogin = async (userData) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+
+    // merge local cart (if any) into server cart
+    try {
+      const raw = localStorage.getItem('localCart');
+      if (raw) {
+        const local = JSON.parse(raw);
+        if (Array.isArray(local) && local.length > 0 && userData && userData.customerId) {
+          for (const item of local) {
+            try {
+              await cartAPI.addToCart(userData.customerId, item.part_id, item.quantity || 1);
+            } catch (err) {
+              // non-fatal: log and continue
+              console.warn('Failed to merge cart item', item, err?.response?.data || err);
+            }
+          }
+          localStorage.removeItem('localCart');
+        }
+      }
+    } catch (err) {
+      console.error('Error merging local cart on login', err);
+    }
   };
 
   const handleLogout = () => {
@@ -62,7 +84,7 @@ function App() {
             />
             <Route 
               path="/cart" 
-              element={user ? <Cart user={user} /> : <Navigate to="/login" />} 
+              element={<Cart user={user} />} 
             />
             <Route 
               path="/orders" 

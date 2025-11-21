@@ -51,12 +51,16 @@ function PartsListing({ user }) {
 
   const handleAddToCart = async (partId) => {
     if (!user) {
+      // redirect anonymous users to login to complete the action
       setMessage('Please login to add items to cart');
+      setTimeout(() => setMessage(''), 2000);
+      window.location.href = '/login';
       return;
     }
 
     if (user.role !== 'customer') {
       setMessage('Only customers can add items to cart');
+      setTimeout(() => setMessage(''), 3000);
       return;
     }
 
@@ -158,7 +162,7 @@ function PartsListing({ user }) {
                   <button 
                     className="btn btn-primary"
                     onClick={() => handleAddToCart(part.part_id)}
-                    disabled={!user || user.role !== 'customer'}
+                    disabled={user && user.role !== 'customer'}
                   >
                     Add to Cart
                   </button>

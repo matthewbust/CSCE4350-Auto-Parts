@@ -1,0 +1,10 @@
+Npm install to install dependencies
+npm run dev to start backend
+
+Use psql to add new items to tables
+Run in psql connected to your ap_db:
+Ensure pgcrypto extension is installed if you plan to use crypt in other inserts:
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+Run the insert script:
+\i path/to/backend/init_parts.sql
+The script inserts 30+ sample parts (oil filter, air filter, brake pads, etc.) and ends with a SELECT to verify.
